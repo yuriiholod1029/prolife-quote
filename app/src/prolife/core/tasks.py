@@ -1,15 +1,16 @@
-
 from celery.utils.log import get_task_logger
 
 from prolife.celery import app
+from prolife.core.email_service import EmailService
 
 logger = get_task_logger(__name__)
 
 
-# Sample Task - You can remove it. This is just for an example.
-
 @app.task
-def add(x, y):
-    return x + y
-
-
+def send_email(email_config, to_list, custom_kwargs, from_email=None):
+    email_service = EmailService(email_config)
+    email_service.send(
+        to_list,
+        from_email=from_email,
+        **custom_kwargs,
+    )
