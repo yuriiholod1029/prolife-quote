@@ -1,0 +1,18 @@
+export POSTGRES_DB=prolife
+export POSTGRES_PASSWORD=0dNt4HKGbdZN1RfL
+export SECRET_KEY='owT8vU50nDwYGVG9URuP2YOGJ1Jp35V4YLsA5GGPN4qaz46280'
+export DATABASE_URL=postgres://postgres:0dNt4HKGbdZN1RfL@localhost:8432/prolife
+
+export CELERY_BROKER_URL=redis://localhost:8379/0
+
+# Flower
+export CELERY_FLOWER_USER=iBBkdG9gflCD4Oem
+export CELERY_FLOWER_PASSWORD=l1lxhQ7OedaLh0kg
+
+
+export DEBUG=on
+export EMAIL_HOST=
+export EMAIL_PORT=
+export EMAIL_HOST_USER=
+export EMAIL_HOST_PASSWORD=
+export SENTRY_DSN=
