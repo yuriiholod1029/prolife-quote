@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from django.conf import settings
 from django.urls import reverse
 
@@ -50,7 +50,7 @@ class Order(models.Model):
     )
 
     sales_rep = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    notes = models.TextField()
+    notes = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=10, default=PROCESSING, choices=STATUS_CHOICES)
     customer_address = models.ForeignKey(CustomerAddress, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='OrderedProduct')
@@ -64,8 +64,16 @@ class Order(models.Model):
             args=[self.id],
         )
 
+    def __str__(self):
+        return f'{self.customer_address.customer.name} - {self.status}'
 
 class OrderedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = ['product', 'order']
+
+    def __str__(self):
+        return f'Product: {self.product.name}, Order: {self.order.id}'

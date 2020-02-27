@@ -83,7 +83,7 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderedProductInline,
     ]
-    list_display = ['id', 'status', 'get_sales_rep_email',]
+    list_display = ['id', 'status', 'get_sales_rep_email', 'get_customer_name']
     list_filter = ['status']
 
     search_fields = ['id',]
@@ -94,8 +94,15 @@ class OrderAdmin(admin.ModelAdmin):
     def get_sales_rep_email(self, obj):
         return obj.sales_rep.email
 
+
     get_sales_rep_email.admin_order_field = 'sales_rep_email'  # Allows column order sorting
     get_sales_rep_email.short_description = 'Sales rep email'  # Renames column head
+
+    def get_customer_name(self, obj):
+        return obj.customer_address.customer.name
+
+    get_customer_name.admin_order_field = 'customer'
+    get_customer_name.short_description = 'Customer'
 
     def save_model(self, request, obj, form, change):
         pass
@@ -129,11 +136,15 @@ class OrderAdmin(admin.ModelAdmin):
                 'order_id': order.id,
                 'order_notes': order.notes,
                 'products': ordered_products,
+                'customer_address': order.customer_address.address,
             },
         )
+
+
 @register(CustomerAddress)
 class CustomerAddressAdmin(admin.ModelAdmin):
-    search_fields = ('get_customer_name', 'id', 'address')
+    search_fields = ['id', 'address', 'customer__name',]
+    list_filter = ['customer__name']
 
     def get_customer_name(self, obj):
         return obj.customer.name
