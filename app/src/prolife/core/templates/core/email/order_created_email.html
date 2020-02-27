@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order {{order_id}} created email</title>
+</head>
+<body>
+<h1>Order Details:</h1>
+Order ID: {{order_id}}
+Order Notes: {{ order_notes }}
+<table>
+    <thead>
+    <tr>
+        <th>
+            Product Name
+        </th>
+        <th>
+            Quantity
+        </th>
+        <th>
+            Amount
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+        <tr>
+            <td>{{product.name}}</td>
+            <td>{{product.quantity}}</td>
+            <td>{{product.amount}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<br><br>
+Thanks,
+<br>
+Prolife Team
+</body>
+</html>

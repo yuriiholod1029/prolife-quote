@@ -1,0 +1,12 @@
+Hi,
+Order details below:
+Order ID: {{order_id}}
+Order Notes: {{order_notes}}
+Product Name, Quantity, Amount
+{% for product in products %}
+    {{product.name}}
+    {{product.quantity}}
+    {{product.amount}}
+{% endfor %}
+Thanks,
+Prolife Team

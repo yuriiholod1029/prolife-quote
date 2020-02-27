@@ -12,6 +12,12 @@ WELCOME_EMAIL = {
     'template_name': 'welcome_email',
 }
 
+ORDER_CREATED_EMAIL = {
+    'subject': 'An order was created!',
+    'message': '',
+    'template_name': 'order_created_email',
+}
+
 
 class EmailService:
     def __init__(self, email_config):
