@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% load staticfiles %}
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
+{% endblock %}
+{% block usertools %}
+    {% if has_permission %}
+    <a class="btn" href="{% url 'admin:core_order_changelist' %}">Orders</a>
+    <a class="btn customer-btn" href="{% url 'admin:core_customer_changelist' %}">Customers</a>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

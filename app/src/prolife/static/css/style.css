@@ -1,0 +1,11 @@
+.btn {
+    background:#000000;
+    padding:10px;
+}
+.btn.customer-btn {
+    position: relative;
+    right:180px;
+}
+.order-amount {
+    font-size:32px;
+}

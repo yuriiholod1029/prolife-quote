@@ -10,32 +10,28 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'{self.name} (sku: {self.sku})'
+        return f'{self.name} (sku: {self.sku}) {self.price}'
 
     class Meta:
         ordering = ['name']
 
+
 class Customer(models.Model):
-    name = models.CharField(max_length=256, unique=True)
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=256)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{8,15}$',
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
     )
-    phone_number = models.CharField(validators=[phone_regex], max_length=16, blank=True)  # validators should be a list
+    phone_number = models.CharField(validators=[phone_regex], max_length=16)  # validators should be a list
+    mobile = models.CharField(validators=[phone_regex], max_length=16, null=True, blank=True)
+    city = models.CharField(max_length=256)
+    county = models.CharField(max_length=256)
+    address = models.CharField(max_length=256)
+    postcode = models.CharField(max_length=256)
 
     def __str__(self):
-        return self.name
-
-
-class CustomerAddress(models.Model):
-    customer = models.ForeignKey(Customer, related_name='customer_address', on_delete=models.CASCADE)
-    address = models.TextField()
-
-    def __str__(self):
-        return f'{self.customer.name}@{self.address}'
-
-    class Meta:
-        ordering = ['customer__name']
+        return f'{self.name}, {self.address}, {self.city}, {self.county} ({self.postcode})'
 
 
 class Order(models.Model):
@@ -52,7 +48,7 @@ class Order(models.Model):
     sales_rep = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     notes = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=10, default=PROCESSING, choices=STATUS_CHOICES)
-    customer_address = models.ForeignKey(CustomerAddress, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='OrderedProduct')
 
     @property
@@ -65,7 +61,8 @@ class Order(models.Model):
         )
 
     def __str__(self):
-        return f'{self.customer_address.customer.name} - {self.status}'
+        return f'{self.customer.name} - {self.status}'
+
 
 class OrderedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

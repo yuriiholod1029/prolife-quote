@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import admin
 from django.contrib.admin import register
 from django.forms import ModelForm, ValidationError
@@ -10,32 +12,28 @@ from prolife.core.email_service import ORDER_CREATED_EMAIL
 from prolife.core.models import (
     Product,
     Customer,
-    CustomerAddress,
     Order,
     OrderedProduct,
 )
 
 
+class CustomModelAdmin(admin.ModelAdmin):
+    exclude_list_display = []
+
+    def __init__(self, model, admin_site):
+        self.list_display = [field.name for field in model._meta.fields if field.name not in self.exclude_list_display]
+        super(CustomModelAdmin, self).__init__(model, admin_site)
+
 
 @register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'sku']
+class ProductAdmin(CustomModelAdmin):
+    exclude_list_display = ['id']
     search_fields = ['name', 'sku']
 
 
-class CustomerAddressInline(admin.TabularInline):
-    model = CustomerAddress
-    extra = 1
-
-
 @register(Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    inlines = [
-        CustomerAddressInline,
-    ]
-
-    list_display = ['id', 'name', 'phone_number']
-    search_fields = ['name', 'phone_number']
+class CustomerAdmin(CustomModelAdmin):
+    search_fields = ['name', 'phone_number', 'email']
 
 
 # TODO: Move to forms.py
@@ -46,12 +44,12 @@ class AtLeastOneRequiredInlineFormSet(BaseInlineFormSet):
         super(AtLeastOneRequiredInlineFormSet, self).clean()
         if any(self.errors):
             return
-        if not any(cleaned_data and not cleaned_data.get('DELETE', False)
-            for cleaned_data in self.cleaned_data):
+        if not any(cleaned_data and not cleaned_data.get('DELETE', False) for cleaned_data in self.cleaned_data):
             raise ValidationError('At least one item required.')
 
 
 class OrderedProductInline(admin.TabularInline):
+    template = 'admin/ordered_product_tabular.html'
     model = OrderedProduct
     raw_id_fields = ['product']
     autocomplete_fields = ['product']
@@ -73,6 +71,7 @@ class OrderForm(ModelForm):
         if not self.request.user.email:
             raise ValidationError("You don't have email which is mandatory to add orders")
         else:
+            self.cleaned_data['sales_rep'] = self.request.user
             return self.cleaned_data
 
 
@@ -80,54 +79,52 @@ class OrderForm(ModelForm):
 class OrderAdmin(admin.ModelAdmin):
 
     form = OrderForm
-    inlines = [
-        OrderedProductInline,
-    ]
-    list_display = ['id', 'status', 'get_sales_rep_email', 'get_customer_name']
+    inlines = [OrderedProductInline]
+    list_display = ['id', 'status', 'get_sales_rep_email', 'customer']
     list_filter = ['status']
 
-    search_fields = ['id',]
+    search_fields = ['id', 'customer__email']
 
-    autocomplete_fields = ('customer_address',)
-    # raw_id_fields = ['customer_address',]
+    autocomplete_fields = ('customer',)
 
     def get_sales_rep_email(self, obj):
         return obj.sales_rep.email
 
-
     get_sales_rep_email.admin_order_field = 'sales_rep_email'  # Allows column order sorting
     get_sales_rep_email.short_description = 'Sales rep email'  # Renames column head
 
-    def get_customer_name(self, obj):
-        return obj.customer_address.customer.name
-
-    get_customer_name.admin_order_field = 'customer'
-    get_customer_name.short_description = 'Customer'
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(sales_rep=request.user)
 
     def save_model(self, request, obj, form, change):
-        pass
+        if not change:
+            obj.sales_rep = request.user
+        super().save_model(request, obj, form, change)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         form.request = request
         return form
 
-    def save_formset(self, request, form, formset, change):
-        is_send_email = not form.instance.pk
-        form.instance.sales_rep = request.user
-        form.instance.save()
-        formset.save()
-        if is_send_email:
-            self.send_order_created_email(form.instance)
+    def response_add(self, request, obj, post_url_continue=None):
+        self.send_order_created_email(obj)
+        return super().response_add(request, obj)
 
     def send_order_created_email(self, order):
         ordered_products = []
+        total_amount = Decimal('0.00')
         for ordered_product in OrderedProduct.objects.filter(order=order).select_related('product'):
+            amount = ordered_product.quantity * ordered_product.product.price
             ordered_products.append({
                 'name': ordered_product.product.name,
                 'quantity': ordered_product.quantity,
-                'amount': ordered_product.quantity * ordered_product.product.price
+                'amount': amount,
             })
+            total_amount += amount
+        customer = order.customer
         send_email.delay(
             ORDER_CREATED_EMAIL,
             settings.ORDER_CREATED_TO_EMAILS + [order.sales_rep.email],
@@ -136,18 +133,12 @@ class OrderAdmin(admin.ModelAdmin):
                 'order_id': order.id,
                 'order_notes': order.notes,
                 'products': ordered_products,
-                'customer_address': order.customer_address.address,
+                'customer_address': f'{customer.address}, {customer.city}, {customer.county}, {customer.postcode}',
+                'total_amount': total_amount,
             },
         )
 
-
-@register(CustomerAddress)
-class CustomerAddressAdmin(admin.ModelAdmin):
-    search_fields = ['id', 'address', 'customer__name',]
-    list_filter = ['customer__name']
-
-    def get_customer_name(self, obj):
-        return obj.customer.name
-
-    get_customer_name.admin_order_field = 'customer_name'  # Allows column order sorting
-    get_customer_name.short_description = 'customer_name'  # Renames column head
+    class Media:
+        js = ('js/order.js',
+            # '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',  # jquery
+        )

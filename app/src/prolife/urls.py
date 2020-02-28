@@ -7,3 +7,7 @@ urlpatterns = [
     path('admin/', site.urls),
     path('', include('django.contrib.auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+site.index_title = ""
+site.site_header = "Prolife Admin"
+site.site_title = "Profile"
