@@ -3,9 +3,16 @@
     padding:10px;
 }
 .btn.customer-btn {
-    position: relative;
-    right:180px;
+    left: 5%;
 }
-.order-amount {
+.total {
     font-size:32px;
+}
+.quick-links-toolbar {
+    height: 36px;
+    margin-bottom: 5px;
+}
+.quick-links-toolbar a {
+    position: relative;
+    top: 10px;
 }

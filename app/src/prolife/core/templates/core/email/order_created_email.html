@@ -5,10 +5,18 @@
   <title>Order {{order_id}} created email</title>
 </head>
 <body>
-<h1>Order Details:</h1>
+<h3>Order Summary:</h3>
 <p>Order ID: {{order_id}}</p>
-<p>Shipping Address: {{ customer_address }}</p>
 <p>Total Amount: {{ total_amount }}</p>
+<h4>Shipping Details</h4>
+<p>Address: {{ customer_address }}</p>
+<h4>Customer Details</h4>
+<p>Phone: {{ customer_phone }}</p>
+{% if customer_mobile %}
+<p>Mobile: {{ customer_mobile }}</p>
+{% endif %}
+<p>Email: {{ customer_mobile }}</p>
+<h4>Order Details:</h4>
 <table border="1">
     <thead>
     <tr>

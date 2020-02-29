@@ -134,6 +134,9 @@ class OrderAdmin(admin.ModelAdmin):
                 'order_notes': order.notes,
                 'products': ordered_products,
                 'customer_address': f'{customer.address}, {customer.city}, {customer.county}, {customer.postcode}',
+                'customer_phone': customer.phone_number,
+                'customer_mobile': customer.mobile,
+                'customer_email': customer.email,
                 'total_amount': total_amount,
             },
         )
