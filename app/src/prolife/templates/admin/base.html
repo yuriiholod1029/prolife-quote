@@ -3,12 +3,3 @@
 {% block extrastyle %}
     <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
 {% endblock %}
-{% block usertools %}
-    {% if has_permission %}
-        <div class="quick-links-toolbar">
-    <a class="btn" href="{% url 'admin:core_order_changelist' %}">Orders</a>
-    <a class="btn customer-btn" href="{% url 'admin:core_customer_changelist' %}">Customers</a>
-        </div>
-    {% endif %}
-    {{ block.super }}
-{% endblock %}
