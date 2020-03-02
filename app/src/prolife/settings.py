@@ -176,7 +176,7 @@ EMAIL_HOST = env('EMAIL_HOST', default='')
 EMAIL_PORT = env('EMAIL_PORT', default=587)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='holodnyijurii@gmail.com')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='Monster@prolifedistribution.co.uk')
 
 ORDER_CREATED_TO_EMAILS = env.list('ORDER_CREATED_TO_EMAILS', default=[])
 ORDER_CREATED_CC_EMAILS = env.list('ORDER_CREATED_CC_EMAILS', default=[])

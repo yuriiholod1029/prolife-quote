@@ -143,7 +143,7 @@ class OrderAdmin(admin.ModelAdmin):
                 'customer_phone': customer.phone_number,
                 'customer_mobile': customer.mobile,
                 'customer_email': customer.email,
-                'total_amount': f'{total_amount} (EX VAT) £',
+                'total_amount': f'£{total_amount} (EX VAT)',
                 'sales_rep_id': order.sales_rep.get_full_name(),
             },
         )
