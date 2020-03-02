@@ -68,7 +68,7 @@ class OrderForm(ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        if not self.request.user.email:
+        if self.instance.pk is None and not self.request.user.email:
             raise ValidationError("You don't have email which is mandatory to add orders")
         else:
             self.cleaned_data['sales_rep'] = self.request.user
@@ -86,6 +86,11 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['id', 'customer__email']
 
     autocomplete_fields = ('customer',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return self.readonly_fields + ('status',)
+        return self.readonly_fields
 
     def get_sales_rep_email(self, obj):
         return obj.sales_rep.email
@@ -128,6 +133,7 @@ class OrderAdmin(admin.ModelAdmin):
         send_email.delay(
             ORDER_CREATED_EMAIL,
             settings.ORDER_CREATED_TO_EMAILS + [order.sales_rep.email],
+            settings.ORDER_CREATED_CC_EMAILS,
             {
                 'order_url': order.url,
                 'order_id': order.id,
@@ -137,7 +143,8 @@ class OrderAdmin(admin.ModelAdmin):
                 'customer_phone': customer.phone_number,
                 'customer_mobile': customer.mobile,
                 'customer_email': customer.email,
-                'total_amount': total_amount,
+                'total_amount': f'{total_amount} (EX VAT) £',
+                'sales_rep_id': order.sales_rep.get_full_name(),
             },
         )
 

@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Order {{order_id}} created email</title>
+  <title>Reign Wholesale Order placed {{ order_id }} by {{ sales_rep_id }}</title>
 </head>
 <body>
+Dear {{ sales_rep_id }}
+<p>thank you for placing an order on behalf of your customer, Prolife distribution will now create the order in their system and ensure the stock is sent out direct to your customer, we will keep you informed of order changes or any issues.</p>
+<p>If you have any questions please call our customer service team on 02085272016 where we will be more than happy to assist you.</p>
 <h3>Order Summary:</h3>
 <p>Order ID: {{order_id}}</p>
-<p>Total Amount: {{ total_amount }}</p>
-<h4>Shipping Details</h4>
+<p>Notes: {{ order_notes }}</p>
+<h4>Shipping Details:</h4>
 <p>Address: {{ customer_address }}</p>
-<h4>Customer Details</h4>
+<h4>Customer Details:</h4>
 <p>Phone: {{ customer_phone }}</p>
 {% if customer_mobile %}
 <p>Mobile: {{ customer_mobile }}</p>
@@ -41,9 +44,10 @@
     {% endfor %}
     </tbody>
 </table>
-<br><br>
-Thanks,
+<p>Total Amount: {{ total_amount }}</p>
 <br>
-Prolife Team
+Kind regards
+<br>
+Prolife Distribution Team
 </body>
 </html>

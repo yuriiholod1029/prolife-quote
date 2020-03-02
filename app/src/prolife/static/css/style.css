@@ -1,6 +1,7 @@
 .btn {
     background:#000000;
     padding:10px;
+    display:none;
 }
 .btn.customer-btn {
     left: 5%;

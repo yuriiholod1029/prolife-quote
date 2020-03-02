@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ WELCOME_EMAIL = {
 }
 
 ORDER_CREATED_EMAIL = {
-    'subject': 'An order was created!',
+    'subject': 'Reign Wholesale Order placed {order_id} by {sales_rep_id}',
     'message': '',
     'template_name': 'order_created_email',
 }
@@ -27,7 +27,7 @@ class EmailService:
         format_kwargs = defaultdict(str, kwargs)
         return text.format_map(format_kwargs)
 
-    def send(self, to_emails, from_email=None, **kwargs):
+    def send(self, to_emails, cc_emails, from_email=None, **kwargs):
         if not to_emails:
             logger.info("Not sending email because no destination emails.")
             return
@@ -41,10 +41,6 @@ class EmailService:
             msg_html = render_to_string(f'core/email/{template_name}.html', context=kwargs)
         from_email = from_email or settings.DEFAULT_FROM_EMAIL
         logger.info("Sending email...")
-        send_mail(
-            subject,
-            msg_plain,
-            from_email,
-            to_emails,
-            html_message=msg_html,
-        )
+        msg = EmailMultiAlternatives(subject, msg_plain, from_email, to=to_emails, cc=cc_emails or [])
+        msg.attach_alternative(msg_html, "text/html")
+        msg.send()

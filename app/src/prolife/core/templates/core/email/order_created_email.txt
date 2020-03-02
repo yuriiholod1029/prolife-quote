@@ -1,12 +1,35 @@
-Hi,
-Order details below:
+Dear {{ sales_rep_id }},
+
+thank you for placing an order on behalf of your customer, Prolife distribution will now create the order in their system and ensure the stock is sent out direct to your customer, we will keep you informed of order changes or any issues.
+
+If you have any questions please call our customer service team on 02085272016 where we will be more than happy to assist you.
+Order Summary:
 Order ID: {{order_id}}
 Order Notes: {{order_notes}}
+
+Shipping Details:
+Address: {{ customer_address }}
+
+Customer Details:
+
+Phone: {{ customer_phone }}
+{% if customer_mobile %}
+
+Mobile: {{ customer_mobile }}
+
+{% endif %}
+
+Email: {{ customer_email }}
+
+Order Details:
 Product Name, Quantity, Amount
 {% for product in products %}
     {{product.name}}
     {{product.quantity}}
     {{product.amount}}
 {% endfor %}
-Thanks,
-Prolife Team
+Total Amount: {{ total_amount }}
+
+Kind regards
+
+Prolife Distribution Team

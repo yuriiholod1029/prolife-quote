@@ -178,7 +178,8 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='holodnyijurii@gmail.com')
 
-ORDER_CREATED_TO_EMAILS = env.list('ORDER_CREATED_TO_EMAILS', default=['holodnyijurii@gmail.com'])
+ORDER_CREATED_TO_EMAILS = env.list('ORDER_CREATED_TO_EMAILS', default=[])
+ORDER_CREATED_CC_EMAILS = env.list('ORDER_CREATED_CC_EMAILS', default=[])
 
 BASE_URL = env('BASE_URL', default='')
 
