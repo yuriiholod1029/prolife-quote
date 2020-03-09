@@ -1,0 +1,22 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block sidebar %}
+    {{ block.super }}
+    {% if request.user.is_superuser %}
+    <div class="app-reports module">
+    <table class="reports" style="width:100%;">
+        <caption>
+            <div class="section" title="{% blocktrans with name='Reports' %}Models in the {{name}} application{% endblocktrans %}">
+                Reports
+            </div>
+        </caption>
+        <tr class="model-sales">
+            <th scope="row">
+                <a href="/core/report/sales/">Sales</a>
+            </th>
+        </tr>
+    </table>
+    </div>
+    {% endif %}
+{% endblock %}

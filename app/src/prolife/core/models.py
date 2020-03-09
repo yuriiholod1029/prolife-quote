@@ -2,7 +2,8 @@ from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator
 from django.conf import settings
 from django.urls import reverse
-
+from django.db.models.functions import ExtractMonth
+from django.db.models import Sum, ExpressionWrapper, F, DecimalField
 
 class Product(models.Model):
     name = models.CharField(max_length=256, unique=True)
@@ -50,6 +51,7 @@ class Order(models.Model):
     status = models.CharField(max_length=10, default=PROCESSING, choices=STATUS_CHOICES)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='OrderedProduct')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def url(self):
@@ -62,6 +64,40 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.customer.name} - {self.status}'
+
+    @classmethod
+    def get_dispatched_order_queryset_in_year_by_month(cls, year):
+        return cls.objects.prefetch_related('orderedproduct').filter(
+            created_at__year=year,
+            status=cls.DISPATCHED,
+        ).annotate(
+            month=ExtractMonth('created_at'),
+        ).values(
+            'month',
+        ).annotate(
+            amount=Sum(
+                ExpressionWrapper(
+                    F('orderedproduct__quantity') * F('orderedproduct__product__price'),
+                    output_field=DecimalField()
+                )
+            ),
+        )
+
+    @classmethod
+    def get_dispatched_order_in_year_by_customers(cls, year):
+        qs = cls.get_dispatched_order_queryset_in_year_by_month(year)
+        return qs.values_list('month', 'amount', 'customer__name').order_by(
+            'customer__email',
+            'month'
+        )
+
+    @classmethod
+    def get_dispatched_order_in_year_by_sales_rep(cls, year):
+        qs = cls.get_dispatched_order_queryset_in_year_by_month(year)
+        return qs.values_list('month', 'amount', 'sales_rep__email').order_by(
+            'sales_rep__email',
+            'month'
+        )
 
 
 class OrderedProduct(models.Model):

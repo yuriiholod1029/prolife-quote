@@ -1,0 +1,23 @@
+{% load get_item %}
+<table class="report table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">{{ first_column }}</th>
+        {% for month in months %}
+      <th scope="col">{{ month }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for entity,monthly_sales in report.items %}
+      <tr>
+      <td>{{ entity }}</td>
+    {% for month_number,month_name in months.items %}
+        <td>
+        £{{  monthly_sales|get_item:month_number|default:'0.00' }}
+        </td>
+    {% endfor %}
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>

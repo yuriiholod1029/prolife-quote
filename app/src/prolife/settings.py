@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'constance',
     'django_extensions',
 
     'prolife.core',
@@ -186,3 +186,14 @@ BASE_URL = env('BASE_URL', default='')
 STATICFILES_DIRS = [
     root('prolife/static'),
 ]
+
+CURRENT_YEAR = dt.datetime.now().year
+# constance settings
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_REDIS_CONNECTION = env('CONSTANCE_REDIS_CONNECTION', default='')
+
+CONSTANCE_CONFIG = {
+    'YEAR': (CURRENT_YEAR, 'The year for which the sales report and top customers are displayed, '
+             'defaults to current year'),
+    'CUSTOM_HTML': ('', 'The custom html that will be displayed below the top customers section')
+}

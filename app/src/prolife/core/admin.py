@@ -53,7 +53,7 @@ class OrderedProductInline(admin.TabularInline):
     model = OrderedProduct
     raw_id_fields = ['product']
     autocomplete_fields = ['product']
-    extra = 1
+    extra = 0
     formset = AtLeastOneRequiredInlineFormSet
 
 

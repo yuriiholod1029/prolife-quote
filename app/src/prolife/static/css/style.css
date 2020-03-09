@@ -17,3 +17,8 @@
     position: relative;
     top: 10px;
 }
+
+.report .thead-dark th{
+    background-color: #417690;
+    border-color: #417690
+}
