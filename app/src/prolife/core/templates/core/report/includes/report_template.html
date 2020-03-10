@@ -3,8 +3,8 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">{{ first_column }}</th>
-        {% for month in months %}
-      <th scope="col">{{ month }}</th>
+        {% for month_number, month_name in months.items %}
+      <th scope="col">{{ month_name }}</th>
       {% endfor %}
     </tr>
   </thead>
