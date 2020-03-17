@@ -26,9 +26,9 @@ class Customer(models.Model):
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=16)  # validators should be a list
     mobile = models.CharField(validators=[phone_regex], max_length=16, null=True, blank=True)
+    address = models.CharField(max_length=256)
     city = models.CharField(max_length=256)
     county = models.CharField(max_length=256)
-    address = models.CharField(max_length=256)
     postcode = models.CharField(max_length=256)
 
     def __str__(self):
@@ -69,7 +69,6 @@ class Order(models.Model):
     def get_dispatched_order_queryset_in_year_by_month(cls, year):
         return cls.objects.prefetch_related('orderedproduct').filter(
             created_at__year=year,
-            status=cls.DISPATCHED,
         ).annotate(
             month=ExtractMonth('created_at'),
         ).values(
