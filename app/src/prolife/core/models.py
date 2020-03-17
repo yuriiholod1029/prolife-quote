@@ -69,6 +69,7 @@ class Order(models.Model):
     def get_dispatched_order_queryset_in_year_by_month(cls, year):
         return cls.objects.prefetch_related('orderedproduct').filter(
             created_at__year=year,
+            status=cls.DISPATCHED,
         ).annotate(
             month=ExtractMonth('created_at'),
         ).values(
